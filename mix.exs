@@ -38,11 +38,7 @@ defmodule Deku.Mixfile do
       {:hedwig_simple_responders, "~> 0.1.2"},
       {:distillery, "~> 1.4"},
       {:runtime_config, "~> 0.1.0"},
-      {:httpoison, "~> 0.11.2", override: true},
-      {:hedwig_currency, "~> 0.1.0"},
-      {:hedwig_weather, "~> 0.1.0"},
-      {:hedwig_youtube, "~> 0.1.0"},
-      {:hedwig_inspire, "~> 0.1.0"},
+      {:httpoison, "~> 0.11", override: true},
     ]
   end
 end
