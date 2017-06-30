@@ -3,6 +3,13 @@ defmodule Deku.Responders.Admin do
 
   require Logger
 
+  @channels Application.get_env(:deku, Deku.Robot)[:rooms]
+
+  respond ~r/list channels$/, msg do
+    Logger.warn inspect(@channels)
+    send msg, inspect(@channels)
+  end
+
   respond ~r/deploy now$/, msg do
     if is_admin?(msg.user) do
       Logger.warn "Deploying now..."
@@ -21,14 +28,14 @@ defmodule Deku.Responders.Admin do
       channel = msg.matches[1]
       kickee = msg.matches[2]
       reason = ":" <> (msg.matches[3] || kickee)
-      # chanserv
+      #chanserv
       pmsg = %{msg | room: "Chanserv"}
       # kick
+      maybe_join(msg, channel)
       send pmsg, "op #{channel}"
       :timer.sleep(1000)
       command msg, Irc.Commands.kick!(channel, kickee, reason)
-      :timer.sleep(1000)
-      send pmsg, "deop #{channel}"
+      leave_or_deop(msg, channel)
     else
       send msg, "No, sir. ಠ_ರೃ"
     end
@@ -41,14 +48,14 @@ defmodule Deku.Responders.Admin do
       channel = msg.matches[1]
       kickee = msg.matches[2]
       opts = msg.matches[3] || ""
-      # chanserv
+      #chanserv
       pmsg = %{msg | room: "Chanserv"}
       # kickban
+      maybe_join(msg, channel)
       send pmsg, "op #{channel}"
       :timer.sleep(1000)
       send pmsg, "AKICK #{channel} ADD #{kickee}#{opts}"
-      :timer.sleep(1000)
-      send pmsg, "deop #{channel}"
+      leave_or_deop(msg, channel)
     else
       send msg, "No, sir. ಠ_ರೃ"
     end
@@ -69,5 +76,36 @@ defmodule Deku.Responders.Admin do
     Config.get_env(:deku, :admins, "")
     |> String.split(",")
     |> Enum.any?(&String.equivalent?(&1, user))
+  end
+
+  @doc """
+  Join channel if not in the channels list.
+  """
+  def maybe_join(msg, channel) do
+    unless is_joined?(channel) do
+      command msg, Irc.Commands.join!(channel)
+      :timer.sleep(500)
+    end
+  end
+
+  @doc """
+  Leave channel if not in the channels list.
+  """
+  def leave_or_deop(msg, channel) do
+    :timer.sleep(500)
+    if is_joined?(channel) do
+      send %{msg | room: "Chanserv"}, "deop #{channel}"
+    else
+      command msg, Irc.Commands.part!(channel)
+    end
+  end
+
+  @doc """
+  Check if the channel is in the channels list.
+  """
+  def is_joined?(channel) do
+    @channels
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.any?(&String.equivalent?(&1, channel))
   end
 end
