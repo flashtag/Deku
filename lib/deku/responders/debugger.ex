@@ -1,5 +1,5 @@
 defmodule Deku.Responders.Debugger do
-  use Hedwig.Responder
+  use Deku.Responder
 
   require Logger
 
