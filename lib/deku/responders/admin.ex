@@ -14,10 +14,10 @@ defmodule Deku.Responders.Admin do
     if is_admin?(msg.user) do
       Logger.warn "Deploying now..."
       System.cmd "curl", [Config.get_env(:deku, :deployhook)]
-      send msg, "Yes, sir. (╭ರᴥ•́)"
+      send msg, "Yes, sir. ੧║ : ︣ ヮ ︣ : ║ㄏ"
     else
       Logger.warn "Loser trying to deploy..."
-      send msg, "No, sir. ಠ_ರೃ"
+      send msg, "No, sir. └| ಠ ‸ ಠ |┘"
     end
   end
 
@@ -37,7 +37,7 @@ defmodule Deku.Responders.Admin do
       command msg, Irc.Commands.kick!(channel, kickee, reason)
       leave_or_deop(msg, channel)
     else
-      send msg, "No, sir. ಠ_ರೃ"
+      send msg, "No, sir. └| ಠ ‸ ಠ |┘"
     end
   end
 
@@ -57,7 +57,7 @@ defmodule Deku.Responders.Admin do
       send pmsg, "AKICK #{channel} ADD #{kickee}#{opts}"
       leave_or_deop(msg, channel)
     else
-      send msg, "No, sir. ಠ_ರೃ"
+      send msg, "No, sir. └| ಠ ‸ ಠ |┘"
     end
   end
 
